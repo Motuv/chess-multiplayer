@@ -1,28 +1,16 @@
 import React from 'react';
 
-import {useState} from 'react';
+import {useState, useContext} from 'react';
 import {Chessboard} from 'react-chessboard';
 import {Chess} from 'chess.js';
+import { useNavigate, Link } from 'react-router-dom';
+import { useGameContext, useGameUpdateContext } from '../context/GameContext';
 
 const Board = (props) => {
 
-    const [game, setGame] = useState(new Chess());
-    const [orientation, setOrientation] = useState('white');
-
-    const makeMove = (move) => {
-        const gameCopy = new Chess();
-        gameCopy.loadPgn(game.pgn());
-        gameCopy.move(move);
-        setGame(gameCopy);
-        props.setRecord(gameCopy)
-        if(gameCopy.isCheckmate()){
-            alert(game.turn()+' won!');
-        }
-        else if(gameCopy.isDraw() || gameCopy.isStalemate() || gameCopy.isThreefoldRepetition()){
-            alert('draw')
-        }
-    }
-
+    const game = useGameContext();
+    const makeMove = useGameUpdateContext();
+    
     const onDrop = (startSquare, endSquare) => {
         try{
             const move = makeMove({
@@ -32,31 +20,24 @@ const Board = (props) => {
             if(move === null){ 
                 return false;
             }  
-
-            
         }
         catch(error){
-            alert(error);
             return false;
         }
 
         if(game.turn()==='b'){
-            setOrientation('white');
             props.setTurn('w');
         }
         else{
-            setOrientation('black');
             props.setTurn('b');
         }
 
-        
-        
         return true;
     }
 
 
   return <div className="mainContent">
-        <Chessboard position={game.fen()} onPieceDrop={onDrop} boardOrientation={orientation}/>      
+        <Chessboard position={game.fen()} onPieceDrop={onDrop} boardOrientation={'white'}/>      
     </div>;
 
 }

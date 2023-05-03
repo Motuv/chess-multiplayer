@@ -57,4 +57,12 @@ body{
   margin: 2%;
   float: left;
 }
-.moves{width: 150px;}
+
+.moves{
+  width: 150px;
+}
+
+.home{
+  padding: 10px;
+  margin: 10px;
+}
