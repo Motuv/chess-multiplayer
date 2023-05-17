@@ -12,32 +12,32 @@ const TimerSection = (props) => {
     const [blackNick, setBlackNick] = useState("")
     
     useEffect(() => {    
-    if(props.turn ==='b'){ 
-        setActiveBlack(true);
-        setActiveWhite(false);
-    }
-    else{
-        setActiveBlack(false);
-        setActiveWhite(true);
-    }
-})
-    useEffect(() => {
-        fetch("/api").then(
-            response => response.json()
-            ).then(
-                data => {
-                setWhiteNick(data["white"]) 
-                setBlackNick(data["black"])
+        if(props.gameStarted){
+            if(props.turn ==='b'){ 
+                setActiveBlack(true);
+                setActiveWhite(false);
             }
-            )
-    }, [])
+            else{
+                setActiveBlack(false);
+                setActiveWhite(true);
+            }
+        }
+    })
 
     return(
-        <div className="rightSideBar">
-            <Nick nick={(typeof whiteNick === 'undefined') ? ("loading"): (whiteNick)}/>
-            <Clock color={'black'} active={activeBlack}/>
-            <Nick nick={(typeof blackNick === 'undefined') ? ("loading"): (blackNick)}/>
-            <Clock color={'white'} active={activeWhite}/>
-        </div>);
+            props.boardOrientation==='white' ? 
+            <div className="rightSideBar">
+                <Nick nick={(typeof whiteNick === 'undefined') ? ("loading"): (whiteNick)}/>
+                <Clock color={'black'} active={activeBlack}/>
+                <Nick nick={(typeof blackNick === 'undefined') ? ("loading"): (blackNick)}/>
+                <Clock color={'white'} active={activeWhite}/>
+            </div>:
+            <div className="rightSideBar">
+                <Nick nick={(typeof blackNick === 'undefined') ? ("loading"): (blackNick)}/>
+                <Clock color={'white'} active={activeWhite}/>
+                <Nick nick={(typeof whiteNick === 'undefined') ? ("loading"): (whiteNick)}/>
+                <Clock color={'black'} active={activeBlack}/>
+            </div>
+        );
 }
 export default TimerSection;

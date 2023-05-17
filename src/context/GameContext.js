@@ -1,11 +1,12 @@
 import React, { useContext } from 'react';
-
+import { useParams } from 'react-router-dom';
 import {useState} from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import {Chess} from 'chess.js';
 
 const GameContext = React.createContext()
 const GameUpdateContext = React.createContext();
+
 
 export function useGameContext(){
     return useContext(GameContext)
@@ -17,8 +18,9 @@ export function useGameUpdateContext(){
 
 export function GameProvider({children}){
     const history = useNavigate();
-
     const [game, setGame] = useState(new Chess());
+    const [players, setPlayers] = useState([]);
+    const id = useParams();
 
     const makeMove = (move) => {
         const gameCopy = new Chess();
@@ -27,11 +29,11 @@ export function GameProvider({children}){
         setGame(gameCopy);
         if(gameCopy.isCheckmate()){
             alert(game.turn()+' won!');
-            history("/home")
+            history("/")
         }
         else if(gameCopy.isDraw() || gameCopy.isStalemate() || gameCopy.isThreefoldRepetition()){
             alert('draw')
-            history("/home")
+            history("/")
         }
     }
 

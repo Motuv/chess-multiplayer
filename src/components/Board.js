@@ -1,43 +1,62 @@
 import React from 'react';
-
-import {useState, useContext} from 'react';
 import {Chessboard} from 'react-chessboard';
-import {Chess} from 'chess.js';
-import { useNavigate, Link } from 'react-router-dom';
 import { useGameContext, useGameUpdateContext } from '../context/GameContext';
+
+import {io} from 'socket.io-client'
+import { useEffect,useState } from 'react';
+
+import {socket} from '../socket'
 
 const Board = (props) => {
 
     const game = useGameContext();
     const makeMove = useGameUpdateContext();
-    
-    const onDrop = (startSquare, endSquare) => {
-        try{
-            const move = makeMove({
-                from: startSquare,
-                to: endSquare,
-            });
-            if(move === null){ 
-                return false;
-            }  
-        }
-        catch(error){
-            return false;
-        }
+    const [color, setColor] = useState('w');
 
-        if(game.turn()==='b'){
-            props.setTurn('w');
+    useEffect(() => {
+        if(props.boardOrientation === 'white'){
+            setColor('w')
         }
         else{
-            props.setTurn('b');
+            setColor('b')
         }
+    },[])
 
-        return true;
+    useEffect(() => {
+        
+
+        socket.on('opponent move', (move) => {
+            try{
+                const newmove = makeMove({
+                    from: move.from,
+                    to: move.to,
+                });
+
+                if(newmove === null){ 
+                    return false;
+                }
+            }
+            catch(error){
+                return false;
+            }
+        })
+    })
+    
+    const onDrop = (startSquare, endSquare) => {
+        if(game.turn() === color){
+            const moveData = {
+                gameId: props.gameId,
+                from: startSquare,
+                to: endSquare
+            }
+            console.log(moveData)
+            socket.emit('new move', moveData)
+        }
     }
 
 
   return <div className="mainContent">
-        <Chessboard position={game.fen()} onPieceDrop={onDrop} boardOrientation={'white'}/>      
+        <Chessboard position={game.fen()} onPieceDrop={onDrop} boardOrientation={props.boardOrientation}/>      
     </div>;
 
 }
